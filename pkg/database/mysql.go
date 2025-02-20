@@ -4,6 +4,7 @@ package database
 
 import (
 	"ReMindful/internal/config"
+	"ReMindful/internal/model"
 	"fmt"
 	"time"
 
@@ -25,6 +26,12 @@ func InitMySQL(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %v", err)
+	}
+
+	// 自动迁移数据库表
+	err = db.AutoMigrate(&model.User{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to migrate database: %v", err)
 	}
 
 	sqlDB, err := db.DB()

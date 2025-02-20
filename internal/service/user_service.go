@@ -42,14 +42,19 @@ func (s *UserService) Register(req *model.RegisterRequest) error {
 	hashedPassword := jwt.HashPassword(req.Password)
 
 	// 创建用户
-	user := model.User{
+	user := &model.User{
 		Username:     req.Username,
 		Email:        req.Email,
 		PasswordHash: string(hashedPassword),
-		Timezone:     "UTC",
+		LastLoginAt:  &time.Time{}, // 初始化最后登录时间
+		Timezone:     "Asia/Shanghai", // 中国时区
 	}
 
-	return s.repo.Create(&user)
+	// 更新最后登录时间
+	now := time.Now()
+	user.LastLoginAt = &now
+
+	return s.repo.Create(user)
 }
 
 // Login 用户登录
@@ -68,7 +73,8 @@ func (s *UserService) Login(req *model.LoginRequest, jwtSecret string) (*model.L
 	}
 
 	// 更新最后登录时间
-	user.LastLoginAt = time.Now()
+	now := time.Now()
+	user.LastLoginAt = &now
 	if err = s.repo.Update(user); err != nil {
 		return nil, err
 	}
