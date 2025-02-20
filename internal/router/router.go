@@ -8,7 +8,11 @@ import (
 	"ReMindful/internal/repository"
 	"ReMindful/internal/service"
 
+	_ "ReMindful/docs"
+
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
@@ -19,6 +23,9 @@ func InitRouter(r *gin.Engine, db *gorm.DB) {
 	jwtSecret := os.Getenv("JWT_SECRET")
 	userService := service.NewUserService(repository.NewUserRepository(db))
 	userHandler := handler.NewUserHandler(userService)
+
+	// Swagger API文档
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// API 路由组
 	api := r.Group("/api/v1")

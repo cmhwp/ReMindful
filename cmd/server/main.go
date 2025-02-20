@@ -1,14 +1,17 @@
 //go:build ignore
 
+//go:generate swag init -g cmd/server/main.go -d . -o docs
+
 package main
 
 import (
 	"fmt"
 	"log"
 
-	"github.com/cmhwp/remindful/internal/config"
-	"github.com/cmhwp/remindful/internal/router"
-	"github.com/cmhwp/remindful/pkg/database"
+	"ReMindful/internal/config"
+	"ReMindful/internal/router"
+	"ReMindful/pkg/database"
+
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,3 +1,4 @@
+// Package response 提供统一的HTTP响应处理
 package response
 
 import (
@@ -6,10 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Response 统一响应结构
+// @Description 所有接口统一返回的数据结构
 type Response struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
+	Code    int         `json:"code" example:"200"`        // 状态码
+	Message string      `json:"message" example:"success"` // 提示信息
+	Data    interface{} `json:"data,omitempty"`            // 数据
 }
 
 func Success(c *gin.Context, data interface{}) {
