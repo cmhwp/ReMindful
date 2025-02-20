@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// 初始化数据库
+// InitMySQL 初始化数据库
 func InitMySQL(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
 		cfg.Username,

@@ -1,3 +1,4 @@
+basePath: /api/v1
 definitions:
   model.LoginRequest:
     properties:
@@ -18,6 +19,8 @@ definitions:
     type: object
   model.RegisterRequest:
     properties:
+      code:
+        type: string
       email:
         type: string
       password:
@@ -25,11 +28,24 @@ definitions:
       username:
         type: string
     required:
+    - code
     - email
     - password
     - username
     type: object
   model.RegisterResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.SendCodeRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  model.SendCodeResponse:
     properties:
       message:
         type: string
@@ -106,6 +122,9 @@ definitions:
     type: object
 info:
   contact: {}
+  description: ReMindful 后端API文档
+  title: ReMindful API
+  version: "1.0"
 paths:
   /login:
     post:
@@ -161,6 +180,32 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: 用户注册
+      tags:
+      - 用户
+  /send-code:
+    post:
+      consumes:
+      - application/json
+      description: 发送邮箱验证码
+      parameters:
+      - description: 邮箱信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.SendCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SendCodeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 发送验证码
       tags:
       - 用户
   /user:

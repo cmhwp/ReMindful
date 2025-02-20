@@ -131,3 +131,28 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 	response.Success(c, gin.H{"message": "更新成功"})
 }
+
+// SendCode 发送验证码
+// @Summary     发送验证码
+// @Description 发送邮箱验证码
+// @Tags        用户
+// @Accept      json
+// @Produce     json
+// @Param       request body model.SendCodeRequest true "邮箱信息"
+// @Success     200 {object} model.SendCodeResponse
+// @Failure     400 {object} response.Response
+// @Router      /send-code [post]
+func (h *UserHandler) SendCode(c *gin.Context) {
+	var req model.SendCodeRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, http.StatusBadRequest, "无效的请求参数")
+		return
+	}
+
+	if err := h.userService.SendVerificationCode(req.Email); err != nil {
+		response.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.Success(c, model.SendCodeResponse{Message: "验证码已发送"})
+}

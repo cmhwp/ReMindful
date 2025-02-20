@@ -20,4 +20,14 @@ jwt:
   secret: Remindful
   expiration: 24h
 
+email:
+  host: smtp.163.com
+  port: 465
+  username: cmh22408@163.com
+  password: QDTXLMQLCARYHZYS
+  from: cmh22408@163.com
+  TLS: false
+  SSL: true
+
+
 

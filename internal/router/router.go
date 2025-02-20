@@ -7,21 +7,24 @@ import (
 	"ReMindful/internal/middleware"
 	"ReMindful/internal/repository"
 	"ReMindful/internal/service"
+	"ReMindful/pkg/utils/email"
 
 	_ "ReMindful/docs"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
-func InitRouter(r *gin.Engine, db *gorm.DB) {
+func InitRouter(r *gin.Engine, db *gorm.DB, rdb *redis.Client, emailSender *email.EmailSender) {
 	// 全局中间件
 	r.Use(middleware.Cors())
 	r.Use(middleware.Logger())
+
 	jwtSecret := os.Getenv("JWT_SECRET")
-	userService := service.NewUserService(repository.NewUserRepository(db))
+	userService := service.NewUserService(repository.NewUserRepository(db), rdb, emailSender)
 	userHandler := handler.NewUserHandler(userService)
 
 	// Swagger API文档
@@ -31,6 +34,7 @@ func InitRouter(r *gin.Engine, db *gorm.DB) {
 	api := r.Group("/api/v1")
 	{
 		// 用户相关路由
+		api.POST("/send-code", userHandler.SendCode)
 		api.POST("/register", userHandler.Register)
 		api.POST("/login", userHandler.Login)
 
