@@ -15,12 +15,12 @@ type Config struct {
 	Redis RedisConfig `mapstructure:"redis"`
 	JWT JWTConfig `mapstructure:"jwt"`
 }
-
+// 服务器配置
 type ServerConfig struct {
 	Port int `mapstructure:"port"`
 	Mode string `mapstructure:"mode"` // 运行模式
 }
-
+// 数据库配置
 type DatabaseConfig struct {
 	Host string `mapstructure:"host"`
 	Port int `mapstructure:"port"`
@@ -29,14 +29,14 @@ type DatabaseConfig struct {
 	Database string `mapstructure:"database"`
 	Charset string `mapstructure:"charset"`
 }
-
+// redis配置
 type RedisConfig struct {
 	Host string `mapstructure:"host"`
 	Port int `mapstructure:"port"`
 	Password string `mapstructure:"password"`
 	DB int `mapstructure:"db"`
 }
-
+// jwt配置
 type JWTConfig struct {
 	Secret string `mapstructure:"secret"`
 	Expiration time.Duration `mapstructure:"expiration"`
