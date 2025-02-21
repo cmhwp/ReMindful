@@ -2,7 +2,7 @@ package repository
 
 import (
 	"ReMindful/internal/model"
-
+	"time"
 	"gorm.io/gorm"
 )
 
@@ -80,3 +80,8 @@ func (r *UserRepository) CheckUsernameExists(username string, excludeID uint) (b
 	err := query.Count(&count).Error
 	return count > 0, err
 }
+// 更新最后登录时间
+func (r *UserRepository) UpdateLastLogin(id uint) error {
+	return r.db.Model(&model.User{}).Where("id = ?", id).Update("last_login", time.Now()).Error
+}
+
