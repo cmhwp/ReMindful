@@ -26,7 +26,8 @@ func InitRouter(r *gin.Engine, db *gorm.DB, rdb *redis.Client, emailSender *emai
 	jwtSecret := os.Getenv("JWT_SECRET")
 	userService := service.NewUserService(repository.NewUserRepository(db), rdb, emailSender)
 	userHandler := handler.NewUserHandler(userService)
-
+	learningCardsService := service.NewLearningCardsService(repository.NewLearningCardsRepository(db), rdb)
+	learningCardsHandler := handler.NewLearningCardsHandler(learningCardsService)
 	// Swagger API文档
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -44,6 +45,12 @@ func InitRouter(r *gin.Engine, db *gorm.DB, rdb *redis.Client, emailSender *emai
 		{
 			auth.GET("/user", userHandler.GetUserInfo)
 			auth.PUT("/user", userHandler.UpdateUser)
+			// 学习卡片相关路由
+			cards := auth.Group("/learning-cards")
+			{
+				cards.POST("", learningCardsHandler.CreateLearningCard)     // 创建卡片
+				cards.GET("/:id", learningCardsHandler.GetLearningCardByID) // 获取卡片
+			}
 		}
 	}
 }

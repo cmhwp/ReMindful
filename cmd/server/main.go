@@ -2,8 +2,12 @@
 // @version 1.0
 // @description ReMindful 后端API文档
 // @BasePath /api/v1
-
-//go:build ignore
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
+// @schemes http https
+// @accept json
+// @produce json
 
 //go:generate swag init -g cmd/server/main.go -d . -o docs
 

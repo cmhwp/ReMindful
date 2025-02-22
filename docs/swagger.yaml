@@ -260,4 +260,9 @@ paths:
       summary: 更新用户信息
       tags:
       - 用户
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
