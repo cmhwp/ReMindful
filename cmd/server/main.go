@@ -18,6 +18,7 @@ import (
 	"log"
 
 	"ReMindful/internal/config"
+	_ "ReMindful/internal/model" // 确保模型被导入
 	"ReMindful/internal/router"
 	"ReMindful/pkg/database"
 	"ReMindful/pkg/utils/email"
@@ -37,6 +38,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize MySQL: %v", err)
 	}
+
+	// 自动迁移数据库表结构
+	if err := database.AutoMigrate(db); err != nil {
+		log.Fatalf("Failed to migrate database: %v", err)
+	}
+
+	// 创建数据库索引
+	if err := database.CreateIndexes(db); err != nil {
+		log.Printf("Warning: Failed to create indexes: %v", err)
+	}
+
 	// 初始化Redis连接
 	redis, err := database.InitRedis(&cfg.Redis)
 	if err != nil {

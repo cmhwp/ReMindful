@@ -21,7 +21,7 @@ type LearningCard struct {
 	EaseFactor   float64     `json:"ease_factor" example:"2.5"`                       // 简易因子
 	Difficulty   float64     `json:"difficulty" example:"0.3"`                        // 难度系数
 	Tags         []Tag       `json:"tags" gorm:"many2many:card_tags;"`
-	ReviewLogs   []ReviewLog `json:"review_logs"`
+	ReviewLogs   []ReviewLog `json:"review_logs" gorm:"foreignKey:CardID"`
 }
 
 // CardType 卡片类型
@@ -34,9 +34,10 @@ const (
 )
 
 // CreateCardRequest 创建卡片请求
+// @Description 创建学习卡片的请求参数
 type CreateCardRequest struct {
-	Title    string   `json:"title" binding:"required"`
-	Content  string   `json:"content" binding:"required"`
-	CardType CardType `json:"card_type" binding:"required"`
+	Title    string   `json:"title" binding:"required" example:"Git基础知识"`
+	Content  string   `json:"content" binding:"required" example:"Git是分布式版本控制系统..."`
+	CardType CardType `json:"card_type" binding:"required" example:"basic"`
 	Tags     []Tag    `json:"tags"`
 }

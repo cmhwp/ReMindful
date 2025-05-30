@@ -14,8 +14,9 @@ import (
 )
 
 type LearningCardsService struct {
-	repo  *repository.LearningCardsRepository
-	redis *redis.Client
+	repo           *repository.LearningCardsRepository
+	reviewLogsRepo *repository.ReviewLogsRepository
+	redis          *redis.Client
 }
 
 func NewLearningCardsService(repo *repository.LearningCardsRepository, redis *redis.Client) *LearningCardsService {
@@ -23,6 +24,11 @@ func NewLearningCardsService(repo *repository.LearningCardsRepository, redis *re
 		repo:  repo,
 		redis: redis,
 	}
+}
+
+// 设置复习日志仓库
+func (s *LearningCardsService) SetReviewLogsRepository(reviewLogsRepo *repository.ReviewLogsRepository) {
+	s.reviewLogsRepo = reviewLogsRepo
 }
 
 // 缓存相关的常量
@@ -43,7 +49,8 @@ func (s *LearningCardsService) CreateLearningCard(card *model.LearningCard) erro
 	card.LastReviewAt = now
 	card.NextReview = now.Add(24 * time.Hour) // 默认24小时后复习
 	card.ReviewCount = 0
-	card.Difficulty = 2.5 // 默认难度系数
+	card.EaseFactor = 2.5 // 默认简易因子
+	card.Difficulty = 0.3 // 默认难度系数
 
 	// 创建学习卡片
 	return s.repo.Create(card)
@@ -126,6 +133,20 @@ func (s *LearningCardsService) UpdateCardReviewStatus(card *model.LearningCard, 
 	card.LastReviewAt = params.LastReview
 	card.NextReview = params.NextReview
 
+	// 创建复习日志
+	if s.reviewLogsRepo != nil {
+		reviewLog := &model.ReviewLog{
+			CardID:      card.ID,
+			UserID:      card.UserID,
+			ReviewTime:  time.Now(),
+			Performance: quality,
+			Duration:    int(duration.Seconds()),
+		}
+
+		// 保存复习日志（忽略错误，不影响主流程）
+		s.reviewLogsRepo.Create(reviewLog)
+	}
+
 	// 更新数据库
 	if err := s.repo.UpdateLearningCard(card); err != nil {
 		return err
@@ -146,6 +167,12 @@ func (s *LearningCardsService) GetLearningCardsByUserID(userID uint) ([]*model.L
 
 // 更新学习卡片
 func (s *LearningCardsService) UpdateLearningCard(card *model.LearningCard) error {
+	// 清除缓存
+	if s.redis != nil {
+		key := fmt.Sprintf("%s%d", cardCacheKeyPrefix, card.ID)
+		s.redis.Del(context.Background(), key)
+	}
+
 	return s.repo.UpdateLearningCard(card)
 }
 
@@ -181,5 +208,11 @@ func (s *LearningCardsService) UpdateReviewParameters(cards []*model.LearningCar
 
 // 软删除
 func (s *LearningCardsService) SoftDelete(id uint) error {
+	// 清除缓存
+	if s.redis != nil {
+		key := fmt.Sprintf("%s%d", cardCacheKeyPrefix, id)
+		s.redis.Del(context.Background(), key)
+	}
+
 	return s.repo.SoftDelete(id)
 }
